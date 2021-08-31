@@ -1,15 +1,9 @@
-import * as React from "react";
+import React from "react";
 import { runForceGraph } from "./forceGraphGenerator";
 import styles from "./forceGraph.module.css";
 
-interface Props {
-  linksData: any;
-  nodesData: any;
-  nodeHoverTooltip?: (node: any, parent?: any) => string;
-}
-
-export function ForceGraph({ linksData, nodesData, nodeHoverTooltip }: Props) {
-  const containerRef = React.useRef<HTMLDivElement>(null);
+export function ForceGraph({ linksData, nodesData, nodeHoverTooltip }) {
+  const containerRef = React.useRef(null);
 
   React.useEffect(() => {
     let destroyFn;

@@ -1,109 +1,43 @@
 import * as d3 from "d3";
-import "d3-force";
-import { noop2 } from "../Graph/graphUtils";
-import styles from "../Graph/secondIteration.module.css";
-import { statusHebToEng } from "../listToGraph/processor";
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import styles from "./forceGraph.module.css";
 
 export function runForceGraph(
-  container: HTMLDivElement,
-  linksData: any,
-  nodesData: any,
-  nodeHoverTooltip: any
+  container,
+  linksData,
+  nodesData,
+  nodeHoverTooltip
 ) {
-  const links = linksData.map((d: any) => Object.assign({}, d, { source: d.start_node, target: d.end_node }));
-  const nodes = nodesData.map((d: any) => Object.assign({}, d, { statusEng: statusHebToEng(d.status), date: d.firstPositiveTestDate ? new Date(d.firstPositiveTestDate) : undefined}));
+  const links = linksData.map((d) => Object.assign({}, d));
+  const nodes = nodesData.map((d) => Object.assign({}, d));
 
   const containerRect = container.getBoundingClientRect();
   const height = containerRect.height;
   const width = containerRect.width;
 
-  const color = (d: d3.HierarchyPointNode) => {
-    switch (d.labels[0]) {
-      case "Tourist": {
-        return "#9D79A0";
-      }
-      case "Patient": {
-        switch (d.statusEng) {
-          case "dead": {
-            return "#7F7D7D";
-          }
-          case "sick": {
-            return "#FB952A";
-          }
-          case "healthy": {
-            return "#1DB022";
-          }
-          default: {
-            return "#fff";
-          }
-        }
-      }
-      case "Flight": {
-        return "#CAD496";
-      }
-      case "Country": {
-        return "#CADFFF";
-      }
-      default: {
-        return "#fff";
-      }
-    }
-  };
+  const color = () => { return "#000"; };
 
-  const icon = (d: d3.HierarchyPointNode) => {
-    switch (d.labels[0]) {
-      case "Tourist": {
-        return '\uf5c1';
-      }
-      case "Patient": {
-        console.log(d);
-        return d.gender === "זכר" ? "\uf222" : "\uf221";
-      }
-      case "Flight": {
-        return '\uf072';
-      }
-      case "Country": {
-        return '\uf0ac';
-      }
-      default: {
-        return undefined;
-      }
-    }
-  };
-
-  const getClass = (d: d3.HierarchyPointNode) => {
-    switch (d.labels[0]) {
-      case "Tourist": {
-        return styles.tourist;
-      }
-      case "Patient": {
-        return d.gender === "male" ? styles.male : styles.female;
-      }
-      case "Flight": {
-        return styles.event;
-      }
-      case "Country": {
-        return undefined;
-      }
-      default: {
-        return undefined;
-      }
-    }
+  const icon = (d) => {
+    return d.gender === "male" ? "\uf233" : "\uf109";
   }
 
-  const drag = (simulation: any) => {
-    const dragstarted = (d: any) => {
+  const getClass = (d) => {
+    return d.gender === "male" ? styles.male : styles.female;
+  };
+
+  const drag = (simulation) => {
+    const dragstarted = (d) => {
       if (!d3.event.active) simulation.alphaTarget(0.3).restart();
       d.fx = d.x;
       d.fy = d.y;
     };
 
-    const dragged = (d: any) => {
+    const dragged = (d) => {
       d.fx = d3.event.x;
       d.fy = d3.event.y;
     };
 
-    const dragended = (d: any) => {
+    const dragended = (d) => {
       if (!d3.event.active) simulation.alphaTarget(0);
       d.fx = null;
       d.fy = null;
@@ -127,18 +61,13 @@ export function runForceGraph(
   }
   const div = d3.select("#graph-tooltip");
 
-  const addTooltip = (
-    hoverTooltip: (node: d3.HierarchyPointNode, parent?: d3.HierarchyPointNode) => string = noop2,
-    d: d3.HierarchyPointNode,
-    x: number,
-    y: number
-  ) => {
+  const addTooltip = (hoverTooltip, d, x, y) => {
     div
       .transition()
       .duration(200)
       .style("opacity", 0.9);
     div
-      .html(hoverTooltip(d, d.parent?.data))
+      .html(hoverTooltip(d))
       .style("left", `${x}px`)
       .style("top", `${y - 28}px`);
   };
@@ -152,15 +81,14 @@ export function runForceGraph(
 
   const simulation = d3
     .forceSimulation(nodes)
-    .force("link", d3.forceLink(links).id((d: d3.HierarchyPointNode) => d.id))
-    .force("charge", d3.forceManyBody().strength(-50))
+    .force("link", d3.forceLink(links).id(d => d.id))
+    .force("charge", d3.forceManyBody().strength(-400))
     .force("x", d3.forceX())
     .force("y", d3.forceY());
 
   const svg = d3
     .select(container)
     .append("svg")
-    // @ts-ignore
     .attr("viewBox", [-width / 2, -height / 2, width, height])
     .call(d3.zoom().on("zoom", function () {
       svg.attr("transform", d3.event.transform);
@@ -173,7 +101,7 @@ export function runForceGraph(
     .selectAll("line")
     .data(links)
     .join("line")
-    .attr("stroke-width", (d: d3.HierarchyPointNode) => Math.sqrt(d.value));
+    .attr("stroke-width", d => Math.sqrt(d.value));
 
   const node = svg
     .append("g")
@@ -194,17 +122,12 @@ export function runForceGraph(
     .append("text")
     .attr('text-anchor', 'middle')
     .attr('dominant-baseline', 'central')
-    .attr("class", (d: d3.HierarchyPointNode) => `fa ${getClass(d)}`)
-    .text((d: d3.HierarchyPointNode) => {return icon(d);})
+    .attr("class", d => `fa ${getClass(d)}`)
+    .text(d => {return icon(d);})
     .call(drag(simulation));
 
-  label.on("mouseover", (d: d3.HierarchyPointNode) => {
-    addTooltip(
-      nodeHoverTooltip,
-      d,
-      d3.event.pageX,
-      d3.event.pageY
-    );
+  label.on("mouseover", (d) => {
+    addTooltip(nodeHoverTooltip, d, d3.event.pageX, d3.event.pageY);
   })
     .on("mouseout", () => {
       removeTooltip();
@@ -213,20 +136,20 @@ export function runForceGraph(
   simulation.on("tick", () => {
     //update link positions
     link
-      .attr("x1", (d: d3.HierarchyPointNode) => d.source.x)
-      .attr("y1", (d: d3.HierarchyPointNode) => d.source.y)
-      .attr("x2", (d: d3.HierarchyPointNode) => d.target.x)
-      .attr("y2", (d: d3.HierarchyPointNode) => d.target.y);
+      .attr("x1", d => d.source.x)
+      .attr("y1", d => d.source.y)
+      .attr("x2", d => d.target.x)
+      .attr("y2", d => d.target.y);
 
     // update node positions
     node
-      .attr("cx", (d: d3.HierarchyPointNode) => d.x)
-      .attr("cy", (d: d3.HierarchyPointNode) => d.y);
+      .attr("cx", d => d.x)
+      .attr("cy", d => d.y);
 
     // update label positions
     label
-      .attr("x", (d: d3.HierarchyPointNode) => { return d.x; })
-      .attr("y", (d: d3.HierarchyPointNode) => { return d.y; })
+      .attr("x", d => { return d.x; })
+      .attr("y", d => { return d.y; })
   });
 
   return {

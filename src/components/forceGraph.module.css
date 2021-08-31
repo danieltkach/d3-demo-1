@@ -1,0 +1,173 @@
+.container {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.container svg {
+  display: block;
+  direction: ltr;
+}
+
+.node circle,
+.node rect {
+  fill: #fff;
+  stroke-width: 3px;
+}
+
+.node.Patiant .icon {
+  width: 30px;
+  height: 30px;
+  font-size: 20px;
+  padding-left: 5px;
+}
+
+.node.Flight rect {
+  stroke: green;
+}
+
+.male {
+  color: rgb(22, 130, 218);
+}
+
+.male.dead {
+  color: rgb(0, 0, 0);
+}
+
+.female {
+  color: rgb(246, 0, 0);
+}
+
+.female.dead {
+  color: rgb(0, 0, 0);
+}
+
+.tourist {
+  color: rgb(150, 0, 230);
+}
+
+.dead {
+  color: rgb(0, 0, 0);
+}
+
+.sick {
+  color: rgb(230, 145, 8);
+}
+
+.healthy {
+  color: rgb(17, 167, 17);
+}
+
+.event polygon {
+  fill: #fff;
+  stroke: green;
+  stroke-width: 3px;
+  transform: translate(-20px, -20px);
+}
+
+.event line {
+  stroke: #ddd;
+  stroke-dasharray: 5;
+  stroke-width: 5px;
+  opacity: 0.3;
+}
+
+.event-text {
+  transform: translate(-20px, 20px);
+}
+
+.event-no-of-events {
+  fill: black;
+  transform: translate(0px, 4px);
+}
+
+.node text {
+  font: 12px sans-serif;
+}
+
+/* Hide fake root */
+.node:global(.level-0) {
+  display: none;
+}
+
+.node--internal text {
+  text-shadow: 0 1px 0 #fff, 0 -1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff;
+}
+
+.case rect {
+  fill: transparent;
+  stroke: green;
+  stroke-width: 3px;
+}
+
+.case line {
+  stroke: brown;
+  stroke-width: 3px;
+}
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 2px;
+  transition: all 0.3s ease;
+}
+
+.doublePatient {
+  stroke: lightgrey;
+  stroke-dasharray: 3;
+}
+
+/* Hide fake root edges */
+.link:global(.level-1) {
+  display: none;
+}
+
+.arrow {
+  fill: lightgrey;
+  stroke: #ccc;
+  stroke-width: 1px;
+}
+
+.link:hover {
+  stroke: brown;
+  stroke-width: 3px;
+}
+
+.line-text {
+  direction: rtl;
+  font: 10px sans-serif;
+}
+
+:global(.tick) text {
+  direction: rtl;
+  transform: rotate(-90deg) translate(-25px, -13px);
+}
+
+div.tooltip {
+  position: absolute;
+  text-align: center;
+  width: 110px;
+  padding: 10px;
+  font: 12px sans-serif;
+  background: lightsteelblue;
+  border: 0;
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+.focused {
+  animation: blink 2s linear;
+  animation-iteration-count: 10;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
